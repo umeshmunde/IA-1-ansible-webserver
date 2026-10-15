@@ -1,0 +1,39 @@
+---
+- name: Configure Nginx Web Server
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: Update package cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+
+    - name: Deploy sample company webpage
+      ansible.builtin.copy:
+        dest: /var/www/html/index.html
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Company Website - DevOps Demo</title>
+          </head>
+          <body>
+            <h1>Welcome to My DevOps Project</h1>
+            <p>Web server configured using Ansible on AWS EC2.</p>
+          </body>
+          </html>
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Ensure Nginx is running and enabled
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
